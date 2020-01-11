@@ -9,22 +9,33 @@ public class Player {
 		Scanner in = new Scanner(System.in);
         Grille grille = new Grille();
         IA robot = new IA();
-        while (true) 
-        { //TODO CONDITION DE FIN DE PARTIE
+        boolean jouer = true ;  
+        while (!grille.asGagner())
+        { 
+        	System.out.println("on rentre") ;
         	grille.afficherGrille(); 
         	
             //grille.afficher();
-            System.out.print("Joueur 1 : Entrez x et y : ");
-            int x = in.nextInt();
-            int y = in.nextInt();
-            grille.jouerUneCase(new Coordonnee(x, y), PION1);
-        	grille.afficherGrille();
-            System.out.print("Joueur 2 : Entrez x et y : ");
+           if(jouer)
+           {
+        	   System.out.print("Joueur 1 : Entrez x et y : ");
+               int x = in.nextInt();
+               int y = in.nextInt();
+               grille.jouerUneCase(new Coordonnee(y, x), PION1);
+               
+           }else
+           {
+        	   System.out.print("Joueur 2 : Entrez x et y : ");
+               int x = in.nextInt();
+               int y = in.nextInt();
+               grille.jouerUneCase(new Coordonnee(y, x), PION2)  ;
+              
+           }
+        	jouer =! jouer ;
             
-             x = in.nextInt();
-             y = in.nextInt();
-            grille.jouerUneCase(new Coordonnee(x,y), PION2)  ;
+            
         }
+        System.out.println("on rentre") ;
 
 	}
 
@@ -101,16 +112,109 @@ class IA{
 class Grille 
 {
 	
-	private static int TAILLE = 3 ;
+	private final int TAILLE = 3 ;
 	private HashMap<Coordonnee, Case> maGrille = new HashMap<Coordonnee, Case>()  ; 
-	private static char VIDE = '-' ; 
+	private final char VIDE = '-' ; 
 	
 	
 	public Grille() 
 	{
 		remplir() ; 
 	} 
+	public boolean asGagner() {
 	
+	        return ligneWin(TAILLE-1)
+	        	|| colWin(TAILLE - 1) 
+	        	|| diag1Win()
+	        	|| diag2Win() ; 
+	             
+	    }
+
+	
+public boolean ligneWin(int y) // prends une ordonnee
+{
+	
+	if (y <0)
+		return false ; 
+	int compteur = 1 ; 
+	char pion = getCase(new Coordonnee(0, y)).getSigne() ;
+
+	for(int x=1 ; x<TAILLE ; x++) //diagonale 1 coordonnee (0,0 1,1  2,2) donc x=y donc i = x = y 
+	{
+		char contenu = getCase(new Coordonnee(x, y)).getSigne() ;
+		if(pion == contenu && contenu != VIDE) //Pour ne pas que la condition de victoire soit validée quand la grille est vide 
+		{
+			compteur++ ; 
+		}
+		pion = contenu ; 
+	}
+	if(compteur == TAILLE) 
+		return true ; 
+	return ligneWin(y-1) ;
+	
+	
+}
+public boolean colWin(int x) //prends une abscisse 
+{
+	if(x < 0)
+		return false ; 
+	int compteur = 1 ; 
+	char pion = getCase(new Coordonnee(x, 0)).getSigne() ;
+
+	for(int y=1 ; y<TAILLE ; y++) //diagonale 1 coordonnee (0,0 1,1  2,2) donc x=y donc i = x = y 
+	{
+		char contenu = getCase(new Coordonnee(x, y)).getSigne() ;
+		if(pion == contenu && contenu != VIDE) //Pour ne pas que la condition de victoire soit validée quand la grille est vide 
+		{
+			compteur++ ; 
+		}
+		pion = contenu ; 
+	}
+	if(compteur == TAILLE)
+		return true ; 
+	return colWin(x - 1) ;	
+	
+}
+public boolean diag1Win() 
+{
+	int compteur = 1 ; 
+	char pion = getCase(new Coordonnee(0, 0)).getSigne() ;
+
+	for(int i=1 ; i<TAILLE ; i++) //diagonale 1 coordonnee (0,0 1,1  2,2) donc x=y donc i = x = y 
+	{
+		char contenu = getCase(new Coordonnee(i, i)).getSigne() ;
+		if(pion == contenu && contenu != VIDE) //Pour ne pas que la condition de victoire soit validée quand la grille est vide 
+		{
+			compteur++ ; 
+		}
+		pion = contenu ; 
+	}
+	if(compteur == TAILLE)
+		return true ; 
+	return false ;	
+	
+}
+
+public boolean diag2Win()
+{
+	int compteur = 1 ; 
+	char pion = getCase(new Coordonnee(0, TAILLE-1)).getSigne() ;
+
+	for(int i=1 ; i<TAILLE ; i++) //diagonale 1 coordonnee (0,2 1,1  2,0) donc x=0, 1, 2 donc y = 2, 1, 0 
+	{
+		char contenu = getCase(new Coordonnee(i, TAILLE-i-1)).getSigne() ;
+		if(pion == contenu && contenu != VIDE) //Pour ne pas que la condition de victoire soit validée quand la grille est vide 
+		{
+			compteur++ ; 
+		}
+		pion = contenu ; 
+	}
+	if(compteur == TAILLE)
+		return true ; 
+	return false ;	
+	
+}
+
 	
 	public Case getCase(Coordonnee coordonnee) 
 	{
